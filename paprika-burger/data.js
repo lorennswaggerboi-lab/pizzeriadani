@@ -2,6 +2,9 @@
  * ============================================================
  *  DATOS DEL NEGOCIO Y MENÚ — ESTE ES EL ÚNICO ARCHIVO A EDITAR
  * ============================================================
+ *  Si se configura "cartaCSV", la carta se carga desde la planilla de Google
+ *  y el local la actualiza desde ahí; MENU queda como respaldo.
+ *
  *  - Cambiar un precio: buscá el producto y cambiá el número.
  *    Los productos con tamaños tienen  precios: { Simple: ..., Doble: ..., Triple: ... }
  *    Los que tienen un solo precio usan  precio: ...
@@ -52,6 +55,10 @@ const NEGOCIO = {
   descuentoEfectivo: 10, // % de descuento pagando en efectivo; 0 para desactivar
 
   aumentoGeneral: 0, // % que se suma a todos los precios
+
+  // Link CSV de la planilla de Google con la carta (ver README, "Panel para el local").
+  // Vacío = se usa la carta de abajo (MENU). Si la planilla falla, también se usa MENU.
+  cartaCSV: "",
 };
 
 const MENU = [

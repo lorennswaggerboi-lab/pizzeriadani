@@ -17,6 +17,7 @@ python3 -m http.server 8000
 | Archivo | Qué es |
 |---|---|
 | `data.js` | **Datos del negocio y carta. Es lo único que hay que tocar para el mantenimiento.** |
+| `plantilla-carta.csv` | Carta completa para importar en Google Sheets |
 | `index.html` | Estructura de la página y etiquetas SEO |
 | `styles.css` | Estilo (colores y tipografías de la marca) |
 | `app.js` | Carrito, horario, mensaje de WhatsApp y datos para Google |
@@ -37,6 +38,36 @@ Todo se hace en `data.js`:
 - **Horarios, zonas y costo de envío:** están en `NEGOCIO`.
 
 El mensaje de WhatsApp, los precios que ve Google y el cartel de abierto/cerrado se actualizan solos a partir de `data.js`.
+
+## Panel para el local (Google Sheets)
+
+El personal del local puede cargar, cambiar o pausar productos desde una planilla de Google, en la compu o en la app de Google Sheets del celular. La web lee la planilla cada vez que alguien la abre.
+
+### Configuración (una sola vez)
+
+1. Entrar a [sheets.new](https://sheets.new) con la cuenta de Google del local.
+2. *Archivo → Importar → Subir* → elegir `plantilla-carta.csv` → "Reemplazar hoja de cálculo". Así la planilla arranca con la carta completa.
+3. *Archivo → Compartir → Publicar en la Web* → elegir la hoja → formato **Valores separados por comas (.csv)** → *Publicar*. Copiar el link.
+4. Pegar ese link en `data.js`, en `cartaCSV: "..."`, y volver a publicar la web.
+
+Para que otros empleados también la editen: *Compartir* → agregar sus mails como **Editor**.
+
+### Cómo se usa
+
+| Columna | Qué poner |
+|---|---|
+| Categoría | Ej: `Burgers`. Si se escribe una categoría nueva, aparece como pestaña nueva. |
+| Nombre / Descripción | Lo que se ve en la tarjeta. |
+| Foto | Link de Google Drive (compartido como "Cualquier persona con el enlace"), un link directo a una imagen, o el nombre de un archivo de `img/`. Vacío = muñequito. |
+| Disponible | `NO` lo oculta (por ejemplo, si se acabó). Cualquier otra cosa lo muestra. |
+| Destacado | `SI` le pone la etiqueta TOP. |
+| Opción 1…4 / Precio 1…4 | Para tamaños: `Simple` 13500, `Doble` 16500… Para precio único: dejar *Opción 1* vacía y poner solo *Precio 1*. Se aceptan `13500`, `13.500` o `$13.500`. |
+
+- Los cambios tardan unos **5 minutos** en verse, porque Google actualiza la versión publicada cada pocos minutos.
+- El orden de la planilla es el orden de la web.
+- Las notas de cada categoría (por ejemplo, "incluyen papas fritas") y los ingredientes de los sándwiches se siguen tomando de `data.js` cuando la categoría tiene el mismo nombre.
+- El **combo del día** busca las burgers por nombre (`American`, `Stacker`, `Cheese`, `Crispy Onion`, `Quarter`). Si cambia el nombre en la planilla, hay que actualizar `COMBO_DIA` en `data.js`.
+- Si la planilla no responde, la web muestra la carta de `data.js`, así nunca queda vacía.
 
 ## Datos a confirmar con el dueño antes de publicar
 

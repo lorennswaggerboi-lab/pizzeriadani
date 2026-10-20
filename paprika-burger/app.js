@@ -12,15 +12,28 @@
   // Lista de [tamaño, precio]; los productos de precio único tienen tamaño ""
   const opciones = (it) => (it.precios ? Object.entries(it.precios) : [["", it.precio]]).map(([t, p]) => [t, ajustar(p)]);
 
+  // La carta sale de la planilla de Google si está configurada; si no, de data.js
+  let CARTA = MENU;
   const ITEMS = {};
-  MENU.forEach((cat) => cat.items.forEach((it) => { ITEMS[it.id] = it; }));
   const disponibles = (cat) => cat.items.filter((it) => it.disponible !== false);
-
-  // Cada combo del día se carga como un producto más, para que el carrito lo trate igual
   const comboId = (id) => `combo-${id}`;
-  Object.values(COMBO_DIA.dias).forEach((id) => {
-    ITEMS[comboId(id)] = { id: comboId(id), nombre: `Combo del día ${ITEMS[id].nombre}`, img: ITEMS[id].img, precios: COMBO_DIA.precios };
-  });
+
+  function indexar() {
+    CARTA.forEach((cat) => cat.items.forEach((it) => { ITEMS[it.id] = it; }));
+    // Cada combo del día se carga como un producto más, para que el carrito lo trate igual
+    Object.values(COMBO_DIA.dias).forEach((id) => {
+      if (ITEMS[id]) ITEMS[comboId(id)] = { id: comboId(id), nombre: `Combo del día ${ITEMS[id].nombre}`, img: ITEMS[id].img, precios: COMBO_DIA.precios };
+    });
+  }
+
+  const esc = (t) => String(t).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
+  // Una foto puede ser un archivo de /img, un link directo o un link compartido de Google Drive
+  const foto = (f) => {
+    if (!f) return "img/mascota.svg";
+    const drive = f.match(/drive\.google\.com\/(?:file\/d\/|open\?id=|uc\?.*id=)([\w-]+)/);
+    if (drive) return `https://drive.google.com/thumbnail?id=${drive[1]}&sz=w800`;
+    return /^https?:\/\//.test(f) ? f : `img/${f}`;
+  };
 
   const dirCompleta = `${N.direccion.calle}, ${N.direccion.localidad}, ${N.direccion.provincia}`;
   const igUrl = `https://www.instagram.com/${N.instagram}/`;
@@ -108,23 +121,85 @@
 
     if (GALERIA.length) {
       $("#galeria").hidden = false;
-      $("#gallery").innerHTML = GALERIA.map((g) => `<img src="img/${g.img}" alt="${g.alt || N.nombre}" loading="lazy">`).join("");
+      $("#gallery").innerHTML = GALERIA.map((g) => `<img src="${foto(g.img)}" alt="${g.alt || N.nombre}" loading="lazy">`).join("");
+    }
+  }
+
+  /* ---------------- Carta desde Google Sheets ---------------- */
+  function parseCSV(txt) {
+    const filas = [[]]; let campo = "", comillas = false;
+    for (let i = 0; i < txt.length; i++) {
+      const c = txt[i];
+      if (comillas) {
+        if (c === '"' && txt[i + 1] === '"') { campo += '"'; i++; }
+        else if (c === '"') comillas = false;
+        else campo += c;
+      } else if (c === '"') comillas = true;
+      else if (c === ",") { filas[filas.length - 1].push(campo); campo = ""; }
+      else if (c === "\n") { filas[filas.length - 1].push(campo); filas.push([]); campo = ""; }
+      else if (c !== "\r") campo += c;
+    }
+    filas[filas.length - 1].push(campo);
+    return filas;
+  }
+
+  const norm = (t) => t.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
+  const numero = (t) => Number(String(t).replace(/[^\d]/g, "")) || 0;
+
+  // Columnas: Categoría, Nombre, Descripción, Foto, Disponible, Destacado, Opción 1, Precio 1 ... Opción 4, Precio 4
+  function cartaDesdeFilas([cabecera, ...filas]) {
+    const col = cabecera.map(norm);
+    const cats = new Map();
+    filas.forEach((f) => {
+      const get = (nombre) => (f[col.indexOf(nombre)] || "").trim();
+      const nombre = get("nombre"), categoria = get("categoria");
+      if (!nombre || !categoria) return;
+      const precios = {};
+      for (let i = 1; i <= 4; i++) { const p = numero(get(`precio ${i}`)); if (p) precios[get(`opcion ${i}`)] = p; }
+      if (!Object.keys(precios).length) return;
+
+      let id = slug(nombre);
+      while (ITEMS[id] || [...cats.values()].some((c) => c.items.some((x) => x.id === id))) id += "-2";
+      const it = { id, nombre, desc: get("descripcion"), img: get("foto"), disponible: !/^no/i.test(get("disponible")), destacado: /^s[ií]/i.test(get("destacado")) };
+      if (Object.keys(precios).length === 1 && precios[""]) it.precio = precios[""]; else it.precios = precios;
+
+      // Las notas y el estilo de cada categoría se toman de data.js si tiene el mismo nombre
+      if (!cats.has(norm(categoria))) {
+        const base = MENU.find((c) => norm(c.categoria) === norm(categoria)) || {};
+        cats.set(norm(categoria), { ...base, categoria, items: [] });
+      }
+      cats.get(norm(categoria)).items.push(it);
+    });
+    return [...cats.values()];
+  }
+
+  async function cargarCarta() {
+    if (!N.cartaCSV) return;
+    try {
+      const r = await fetch(N.cartaCSV, { cache: "no-store" });
+      if (!r.ok) throw new Error(`HTTP ${r.status}`);
+      const carta = cartaDesdeFilas(parseCSV(await r.text()));
+      if (carta.length) CARTA = carta;
+    } catch (e) {
+      console.warn("No se pudo leer la planilla de la carta; se usa la de data.js.", e);
     }
   }
 
   /* ---------------- Combo del día ---------------- */
   function pintarCombos() {
     const hoy = ahoraArgentina().dia;
-    const orden = [1, 2, 3, 4, 5, 6, 0].filter((d) => COMBO_DIA.dias[d]);
+    const orden = [1, 2, 3, 4, 5, 6, 0].filter((d) => ITEMS[COMBO_DIA.dias[d]]);
+    $("#combos").hidden = !orden.length;
+    if (!orden.length) return;
     $("#combo-grid").innerHTML = orden.map((d) => {
       const it = ITEMS[COMBO_DIA.dias[d]];
       const esHoy = d === hoy;
       return `
         <article class="combo ${esHoy ? "hoy" : ""}">
           ${esHoy ? '<span class="hoy-tag">HOY</span>' : ""}
-          <img src="img/${it.img || "mascota.svg"}" alt="${it.nombre}" loading="lazy">
+          <img src="${foto(it.img)}" alt="${esc(it.nombre)}" loading="lazy">
           <h3>${DIAS[d]}</h3>
-          <p>${it.nombre}</p>
+          <p>${esc(it.nombre)}</p>
           ${esHoy ? `<div class="combo-btns">${opciones(ITEMS[comboId(it.id)]).map(([t]) =>
             `<button class="btn price-combo" data-key="${comboId(it.id)}::${t}">+ ${t}</button>`).join("")}</div>` : ""}
         </article>`;
@@ -134,41 +209,46 @@
     $("#combo-foot").innerHTML = `
       <p class="cat-note">★ ${COMBO_DIA.nota} ★</p>
       <div class="precios">${opciones({ precios: COMBO_DIA.precios }).map(([t, p]) => `<span>${t}<strong>${fmt(p)}</strong></span>`).join("")}</div>
-      ${COMBO_DIA.dias[hoy] ? "" : `<p class="muted">Hoy ${DIAS[hoy].toLowerCase()} no hay combo del día: ¡te esperamos el ${DIAS[proximo].toLowerCase()}!</p>`}`;
+      ${ITEMS[COMBO_DIA.dias[hoy]] ? "" : `<p class="muted">Hoy ${DIAS[hoy].toLowerCase()} no hay combo del día: ¡te esperamos el ${DIAS[proximo].toLowerCase()}!</p>`}`;
   }
 
   /* ---------------- Carta ---------------- */
   const slug = (s) => s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/\W+/g, "-");
 
   function pintarMenu() {
-    const cats = MENU.filter((c) => disponibles(c).length);
+    const cats = CARTA.filter((c) => disponibles(c).length);
     $("#tabs").innerHTML = cats.map((c, i) =>
-      `<button class="tab" role="tab" aria-selected="${i === 0}" data-target="cat-${slug(c.categoria)}">${c.categoria}</button>`).join("");
+      `<button class="tab" role="tab" aria-selected="${i === 0}" data-target="cat-${slug(c.categoria)}">${esc(c.categoria)}</button>`).join("");
 
     $("#menu-list").innerHTML = cats.map((c, i) => `
       <div class="cat ${c.script ? "script" : ""}" id="cat-${slug(c.categoria)}">
         <div class="cat-head">
-          <h3>${c.categoria}</h3>
+          <h3>${esc(c.categoria)}</h3>
           ${!c.script && i === 0 ? '<img src="img/mascota.svg" alt="" width="84" height="91">' : ""}
         </div>
         <div class="rule"></div>
         ${c.nota ? `<p class="cat-note">★ ${c.nota} ★</p>` : ""}
-        ${disponibles(c).map((it) => `
-          <div class="row ${it.img ? "has-photo" : ""}">
-            ${it.img ? `<img class="row-photo" src="img/${it.img}" alt="${it.nombre}" loading="lazy">` : ""}
-            <div>
-              <h4>${it.nombre}${it.destacado ? '<span class="tag">TOP</span>' : ""}</h4>
-              ${it.desc ? `<p>${it.desc}</p>` : ""}
-            </div>
-            <div class="prices">
-              ${opciones(it).map(([t, p]) => `
-                <button class="price" data-key="${it.id}::${t}" aria-label="Agregar ${it.nombre} ${t}">
-                  ${t ? `<small>${t}</small>` : ""}
-                  <strong>${fmt(p)}</strong>
-                  <span class="add">+ Agregar</span>
-                </button>`).join("")}
-            </div>
-          </div>`).join("")}
+        <div class="productos">
+          ${disponibles(c).map((it) => `
+            <article class="producto">
+              <div class="producto-img ${it.img ? "" : "sin-foto"}">
+                <img src="${foto(it.img)}" alt="${it.img ? esc(it.nombre) : ""}" loading="lazy">
+                ${it.destacado ? '<span class="tag">TOP</span>' : ""}
+              </div>
+              <div class="producto-body">
+                <h4>${esc(it.nombre)}</h4>
+                ${it.desc ? `<p>${esc(it.desc)}</p>` : ""}
+              </div>
+              <div class="producto-precios">
+                ${opciones(it).map(([t, p]) => `
+                  <button class="price" data-key="${esc(it.id)}::${esc(t)}" aria-label="Agregar ${esc(it.nombre)} ${esc(t)}">
+                    <small>${t ? esc(t) : "Precio"}</small>
+                    <strong>${fmt(p)}</strong>
+                    <span class="add" aria-hidden="true">+</span>
+                  </button>`).join("")}
+              </div>
+            </article>`).join("")}
+        </div>
         ${c.info ? `<div class="cat-info">${c.info.map((x) => `<div><b>${x.titulo}</b><span>${x.texto}</span></div>`).join("")}</div>` : ""}
       </div>`).join("");
 
@@ -204,7 +284,6 @@
   };
   let carrito = {};
   try { carrito = JSON.parse(localStorage.getItem(KEY)) || {}; } catch { carrito = {}; }
-  Object.keys(carrito).forEach((k) => { if (!valida(k)) delete carrito[k]; });
 
   const guardar = () => { try { localStorage.setItem(KEY, JSON.stringify(carrito)); } catch { /* sin storage */ } };
 
@@ -333,7 +412,7 @@
         "@type": "Menu",
         name: `Carta ${N.nombre}`,
         url: `${N.url}/#menu`,
-        hasMenuSection: MENU.map((c) => ({
+        hasMenuSection: CARTA.map((c) => ({
           "@type": "MenuSection",
           name: c.categoria,
           hasMenuItem: disponibles(c).map((it) => ({
@@ -353,26 +432,32 @@
 
   /* ---------------- Inicio ---------------- */
   pintarInfo();
-  pintarCombos();
-  pintarMenu();
   pintarEstado();
-  pintarCarrito();
-  schema();
 
-  let diaActual = ahoraArgentina().dia;
-  setInterval(() => {
-    pintarEstado();
-    if (ahoraArgentina().dia === diaActual) return;
-    // Cambió el día: se actualiza el combo y se descarta el de ayer del carrito
-    diaActual = ahoraArgentina().dia;
+  cargarCarta().then(() => {
+    indexar();
     Object.keys(carrito).forEach((k) => { if (!valida(k)) delete carrito[k]; });
-    guardar(); pintarCombos(); pintarCarrito();
-  }, 60 * 1000);
+    pintarCombos();
+    pintarMenu();
+    pintarCarrito();
+    schema();
+
+    let diaActual = ahoraArgentina().dia;
+    setInterval(() => {
+      pintarEstado();
+      if (ahoraArgentina().dia === diaActual) return;
+      // Cambió el día: se actualiza el combo y se descarta el de ayer del carrito
+      diaActual = ahoraArgentina().dia;
+      Object.keys(carrito).forEach((k) => { if (!valida(k)) delete carrito[k]; });
+      guardar(); pintarCombos(); pintarCarrito();
+    }, 60 * 1000);
+
+    $("#checkout").addEventListener("change", pintarCarrito);
+  });
 
   $("#combo-grid").addEventListener("click", (e) => {
     const b = e.target.closest(".price-combo"); if (b) cambiar(b.dataset.key, 1);
   });
-
   $("#cart-fab").addEventListener("click", () => abrirCarrito(true));
   $("#cart-close").addEventListener("click", () => abrirCarrito(false));
   $("#overlay").addEventListener("click", () => abrirCarrito(false));
@@ -380,6 +465,5 @@
   $("#cart-items").addEventListener("click", (e) => {
     const b = e.target.closest("[data-act]"); if (b) cambiar(b.closest("[data-key]").dataset.key, Number(b.dataset.act));
   });
-  $("#checkout").addEventListener("change", pintarCarrito);
   $("#checkout").addEventListener("submit", enviar);
 })();
