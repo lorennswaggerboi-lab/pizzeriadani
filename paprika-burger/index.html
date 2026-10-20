@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="es-AR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Paprika Burger | Hamburguesería en Moreno · Delivery y Take Away</title>
+  <meta name="description" content="Paprika Burger, hamburguesería en Moreno Centro (9 de Julio 219). Burgers simples, dobles y triples, hot dogs y sándwiches. Pedí online por WhatsApp con delivery. 10% off en efectivo.">
+  <link rel="canonical" href="https://paprikaburger.com.ar/">
+  <meta name="theme-color" content="#c4122f">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+
+  <meta name="geo.region" content="AR-B">
+  <meta name="geo.placename" content="Moreno, Buenos Aires">
+
+  <meta property="og:type" content="restaurant">
+  <meta property="og:locale" content="es_AR">
+  <meta property="og:title" content="Paprika Burger · Hamburguesería en Moreno">
+  <meta property="og:description" content="La espera vale cada mordida. Pedí online y recibilo en tu casa.">
+  <meta property="og:url" content="https://paprikaburger.com.ar/">
+  <meta property="og:image" content="https://paprikaburger.com.ar/img/mascota.svg">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bowlby+One&family=Inter:wght@400;500;600;700&family=Lobster&family=Oswald:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="checker" aria-hidden="true"></div>
+
+  <header class="topbar">
+    <a href="#inicio" class="logo logo-sm" aria-label="Paprika Burger, inicio">
+      <span class="logo-main">Paprika</span><span class="logo-sub">Burger</span>
+    </a>
+    <nav class="nav" aria-label="Principal">
+      <a href="#menu">Carta</a>
+      <a href="#envios">Envíos y pagos</a>
+      <a href="#ubicacion">Ubicación</a>
+    </nav>
+    <span class="status" id="status-top" role="status"></span>
+  </header>
+
+  <main>
+    <section class="hero" id="inicio">
+      <div class="hero-text">
+        <h1 class="logo logo-xl"><span class="logo-main">Paprika</span><span class="logo-sub">Burger</span></h1>
+        <p class="tagline">La espera<br>vale cada<br>mordida</p>
+        <div class="hero-cta">
+          <a href="#menu" class="btn btn-red">Ver carta y pedir</a>
+          <a id="ig-hero" class="btn btn-line" target="_blank" rel="noopener">Instagram</a>
+        </div>
+        <p class="hero-phone">Pedí al <a id="tel-hero"></a></p>
+      </div>
+      <div class="hero-art">
+        <img src="img/mascota.svg" alt="Mascota de Paprika Burger: una hamburguesa con gorra y anteojos de sol" width="240" height="260">
+      </div>
+    </section>
+
+    <div class="promo" id="promo">
+      <span>★</span> <strong id="promo-pct"></strong> de descuento abonando en efectivo <span>★</span>
+    </div>
+
+    <section class="section" id="menu" aria-labelledby="menu-title">
+      <h2 id="menu-title" class="sr-only">Carta</h2>
+      <div class="tabs" id="tabs" role="tablist"></div>
+      <div class="board">
+        <div id="menu-list"></div>
+      </div>
+    </section>
+
+    <section class="section" id="galeria" aria-labelledby="galeria-title" hidden>
+      <h2 id="galeria-title" class="title">Nuestras burgers</h2>
+      <div class="gallery" id="gallery"></div>
+    </section>
+
+    <section class="section info-grid" id="envios" aria-labelledby="envios-title">
+      <div class="card">
+        <h2 id="envios-title" class="title">Envíos</h2>
+        <ul class="chips" id="zonas"></ul>
+        <p id="envio-costo"></p>
+        <p class="muted">¿Tu barrio no está? Escribinos y te confirmamos.</p>
+      </div>
+      <div class="card">
+        <h2 class="title">Pagos</h2>
+        <ul class="pay" id="pagos"></ul>
+        <p class="muted">Los datos para transferencia o el link de Mercado Pago te los pasamos por WhatsApp al confirmar.</p>
+      </div>
+      <div class="card">
+        <h2 class="title">Horarios</h2>
+        <table class="hours" id="horarios"></table>
+      </div>
+    </section>
+
+    <section class="section" id="ubicacion" aria-labelledby="ubic-title">
+      <h2 id="ubic-title" class="title">Dónde estamos</h2>
+      <p class="muted center" id="direccion-texto"></p>
+      <div class="map-wrap">
+        <iframe id="mapa" title="Mapa de Paprika Burger" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+      </div>
+      <div class="hero-cta center">
+        <a id="como-llegar" class="btn btn-line" target="_blank" rel="noopener">Cómo llegar</a>
+        <a id="llamar" class="btn btn-line"></a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="logo logo-sm"><span class="logo-main">Paprika</span><span class="logo-sub">Burger</span></div>
+    <p id="footer-dir"></p>
+    <p><a id="ig-footer" target="_blank" rel="noopener"></a> · <a id="wa-footer" target="_blank" rel="noopener">WhatsApp</a></p>
+    <p class="small">Precios sujetos a cambio sin previo aviso.</p>
+  </footer>
+  <div class="checker" aria-hidden="true"></div>
+
+  <!-- Botón flotante del carrito -->
+  <button class="cart-fab" id="cart-fab" aria-controls="cart" aria-expanded="false" hidden>
+    <span class="cart-count" id="cart-count">0</span>
+    Ver pedido · <span id="cart-fab-total"></span>
+  </button>
+
+  <!-- Panel del carrito -->
+  <div class="overlay" id="overlay" hidden></div>
+  <aside class="cart" id="cart" aria-label="Tu pedido" aria-hidden="true">
+    <div class="cart-head">
+      <h2 class="title">Tu pedido</h2>
+      <button class="icon-btn" id="cart-close" aria-label="Cerrar">✕</button>
+    </div>
+    <div class="cart-body">
+      <ul class="cart-items" id="cart-items"></ul>
+      <p class="muted empty" id="cart-empty">Todavía no agregaste nada.</p>
+
+      <form id="checkout" class="checkout" novalidate>
+        <fieldset class="seg">
+          <legend>Entrega</legend>
+          <label><input type="radio" name="entrega" value="envio" checked> Envío a domicilio</label>
+          <label><input type="radio" name="entrega" value="retiro"> Retiro en el local</label>
+        </fieldset>
+
+        <label>Tu nombre
+          <input name="nombre" autocomplete="name" required>
+        </label>
+        <label class="only-envio">Dirección
+          <input name="direccion" autocomplete="street-address" placeholder="Calle, número, entre calles">
+        </label>
+        <label class="only-envio">Barrio
+          <select name="barrio" id="barrio"></select>
+        </label>
+        <label>Forma de pago
+          <select name="pago" id="pago"></select>
+        </label>
+        <label class="only-efectivo">¿Con cuánto abonás?
+          <input name="vuelto" inputmode="numeric" placeholder="Ej: 20000">
+        </label>
+        <label>Aclaraciones
+          <textarea name="notas" rows="3" placeholder="Ingredientes del sándwich, opción veggie NotCo, sin cebolla, etc."></textarea>
+        </label>
+      </form>
+    </div>
+    <div class="cart-foot">
+      <div class="totals" id="totals"></div>
+      <p class="warn" id="closed-warn" hidden>Ahora estamos cerrados: tomamos tu pedido para cuando abramos.</p>
+      <button class="btn btn-wa" id="send" type="submit" form="checkout">Enviar pedido por WhatsApp</button>
+    </div>
+  </aside>
+
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
