@@ -426,8 +426,7 @@ a { color: inherit; }
 
 /* ---------- Cinta de la promo y bordes a cuadros ---------- */
 .promo { padding: 14px 0; overflow: hidden; white-space: nowrap; }
-.marquee { display: flex; width: max-content; animation: cinta 28s linear infinite; }
-.promo:hover .marquee { animation-play-state: paused; }
+.marquee { display: flex; width: max-content; animation: cinta 42s linear infinite; }
 .marquee-track { display: flex; }
 .marquee-track span { padding: 0 28px; }
 @keyframes cinta { to { transform: translateX(-50%); } }
@@ -459,4 +458,6 @@ a { color: inherit; }
 
 @media (prefers-reduced-motion: reduce) {
   * { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+  /* La cinta de la promo se mueve siempre, como una cinta transportadora */
+  .marquee { animation: cinta 42s linear infinite !important; }
 }

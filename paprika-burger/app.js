@@ -105,7 +105,7 @@
     $("#promo").hidden = !N.descuentoEfectivo;
     // Cinta que se desplaza: el texto se repite dos veces para que el bucle no tenga cortes
     const frase = `<span>★ <strong>${N.descuentoEfectivo}%</strong> de descuento abonando en efectivo</span>`;
-    const tira = `<div class="marquee-track">${frase.repeat(4)}</div>`;
+    const tira = `<div class="marquee-track">${frase.repeat(6)}</div>`;
     $("#marquee").innerHTML = tira + tira.replace("marquee-track", 'marquee-track" aria-hidden="true');
 
     $("#zonas").innerHTML = N.envio.zonas.map((z) => `<li>${z}</li>`).join("");
