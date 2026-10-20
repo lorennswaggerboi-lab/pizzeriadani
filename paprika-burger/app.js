@@ -316,7 +316,7 @@
       <div class="cat ${c.script ? "script" : ""}" id="cat-${slug(c.categoria)}">
         <div class="cat-head">
           <h3>${esc(c.categoria)}</h3>
-          ${!c.script && i === 0 ? '<img src="img/mascota.svg" alt="" width="84" height="91">' : ""}
+          ${!c.script && i === 0 ? '<img src="img/mascota.svg" alt="" width="84" height="77">' : ""}
         </div>
         <div class="rule"></div>
         ${c.nota ? `<p class="cat-note">★ ${c.nota} ★</p>` : ""}
@@ -478,7 +478,7 @@
       slogan: N.slogan,
       url: N.url,
       logo: `${N.url}/favicon.svg`,
-      image: `${N.url}/img/mascota.svg`,
+      image: `${N.url}/img/stacker.jpg`,
       telephone: `+${N.whatsapp}`,
       servesCuisine: ["Hamburguesas", "Hot dogs", "Sándwiches", "Comida rápida"],
       priceRange: N.rangoPrecios,

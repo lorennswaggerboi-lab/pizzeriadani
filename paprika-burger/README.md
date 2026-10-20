@@ -22,6 +22,7 @@ python3 -m http.server 8000
 | `styles.css` | Estilo (colores y tipografías de la marca) |
 | `app.js` | Carrito, horario, mensaje de WhatsApp y datos para Google |
 | `img/` | Mascota y fotos |
+| `favicon.svg`, `favicon-32.png`, `apple-touch-icon.png` | Ícono de la pestaña y del acceso directo en el celular |
 | `robots.txt`, `sitemap.xml` | Para que Google indexe la página |
 
 ## Mantenimiento (actualizar precios)
@@ -78,7 +79,7 @@ Se tomaron de internet y de las historias destacadas de Instagram. Puede haber d
 - [ ] **WhatsApp:** 11 2548-3069, de las historias. Otro posteo dice 11 6807-3250.
 - [ ] **Zonas y costo de envío:** las zonas son una propuesta. El costo figura como "a confirmar".
 - [ ] **Precios:** se usó la carta de WhatsApp. Las historias de Instagram tienen algunos precios distintos (Spicy, Pomodoro, Crispy Onion) y la burger "Campeona", que no está en la carta de WhatsApp.
-- [ ] **Logo y mascota:** `img/mascota.svg` es un dibujo aproximado. Reemplazarlo por el archivo original de la marca.
+- [ ] **Mascota:** `img/mascota.svg` está redibujada en vector a partir de una captura de la marca. Si el local tiene el archivo original, conviene usarlo.
 - [ ] **Fotos de los productos:** ya están las de Cheese, American, Stacker y Crispy Onion. La del Quarter está recortada del flyer de combos. Faltan las del resto de la carta.
 - [ ] **Combo del día:** miércoles a domingo, según el flyer. Lunes y martes no hay combo.
 
