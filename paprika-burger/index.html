@@ -8,6 +8,8 @@
   <link rel="canonical" href="https://paprikaburger.com.ar/">
   <meta name="theme-color" content="#c4122f">
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="favicon-32.png" sizes="32x32" type="image/png">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
 
   <meta name="geo.region" content="AR-B">
   <meta name="geo.placename" content="Moreno, Buenos Aires">
@@ -17,7 +19,7 @@
   <meta property="og:title" content="Paprika Burger · Hamburguesería en Moreno">
   <meta property="og:description" content="La espera vale cada mordida. Pedí online y recibilo en tu casa.">
   <meta property="og:url" content="https://paprikaburger.com.ar/">
-  <meta property="og:image" content="https://paprikaburger.com.ar/img/mascota.svg">
+  <meta property="og:image" content="https://paprikaburger.com.ar/img/stacker.jpg">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -44,7 +46,7 @@
     <section class="hero" id="inicio">
       <div class="hero-text">
         <h1 class="logo logo-xl"><span class="logo-main">Paprika</span><span class="logo-sub">Burger</span></h1>
-        <p class="tagline">La espera<br>vale cada<br>mordida</p>
+        <p class="tagline"><span>La espera</span><span>vale cada</span><span>mordida</span></p>
         <div class="hero-cta">
           <a href="#menu" class="btn btn-red">Ver carta y pedir</a>
           <a id="ig-hero" class="btn btn-line" target="_blank" rel="noopener">Instagram</a>
@@ -53,13 +55,11 @@
       </div>
       <div class="hero-art">
         <img class="hero-photo" src="img/stacker.jpg" alt="Stacker triple de Paprika Burger con papas fritas" width="900" height="1200" fetchpriority="high">
-        <img class="hero-mascot" src="img/mascota.svg" alt="" width="240" height="260">
+        <img class="hero-mascot" src="img/mascota.svg" alt="" width="283" height="258">
       </div>
     </section>
 
-    <div class="promo" id="promo">
-      <span>★</span> <strong id="promo-pct"></strong> de descuento abonando en efectivo <span>★</span>
-    </div>
+    <div class="promo" id="promo"><div class="marquee" id="marquee"></div></div>
 
     <section class="section combos" id="combos" aria-labelledby="combos-title">
       <p class="combo-kicker">Todos los días</p>
@@ -119,6 +119,14 @@
     <p class="small">Precios sujetos a cambio sin previo aviso.</p>
   </footer>
   <div class="checker" aria-hidden="true"></div>
+
+  <!-- Detalle de un producto o combo -->
+  <dialog class="detalle" id="detalle" aria-labelledby="detalle-titulo">
+    <button class="icon-btn detalle-close" id="detalle-close" aria-label="Cerrar">✕</button>
+    <div id="detalle-body"></div>
+  </dialog>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
   <!-- Botón flotante del carrito -->
   <button class="cart-fab" id="cart-fab" aria-controls="cart" aria-expanded="false" hidden>
