@@ -85,6 +85,10 @@ Se tomaron de internet y de las historias destacadas de Instagram. Puede haber d
 
 ## Publicar
 
+**GitHub Pages (ya configurado):** la web se publica desde `main` en https://lorennswaggerboi-lab.github.io/pizzeriadani/. Cada cambio que entra a `main` se publica solo en uno o dos minutos. Si no aparece, revisar en *Settings → Pages* que la fuente sea **Deploy from a branch → `main` → `/ (root)`**.
+
+Otras opciones:
+
 1. Subir la carpeta a **Netlify**, **Vercel** o **GitHub Pages** (todos tienen plan gratis).
 2. Comprar el dominio `.com.ar` en [NIC Argentina](https://nic.ar) y conectarlo.
 3. Si el dominio no es `paprikaburger.com.ar`, reemplazarlo en `index.html` (canonical y og), en `data.js` (`url`), en `robots.txt` y en `sitemap.xml`.
