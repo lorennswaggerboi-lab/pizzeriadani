@@ -59,12 +59,12 @@ const MENU = [
     categoria: "Burgers",
     nota: "Todos nuestros combos incluyen papas fritas · Todas tienen opción veggie con medallón NotCo",
     items: [
-      { id: "cheese", nombre: "Cheese", desc: "Pan, carne y cheddar.", precios: { Simple: 12500, Doble: 15500, Triple: 18500 } },
+      { id: "cheese", nombre: "Cheese", desc: "Pan, carne y cheddar.", img: "cheese.jpg", precios: { Simple: 12500, Doble: 15500, Triple: 18500 } },
       { id: "cheese-bacon", nombre: "Cheese Bacon", desc: "Pan, carne, extra cheddar, extra bacon.", precios: { Simple: 14000, Doble: 17000, Triple: 20000 } },
-      { id: "american", nombre: "American", desc: "Pan, carne, cheddar, bacon, lechuga, tomate, cebolla, pepinillos agridulces y salsa Paprika.", precios: { Simple: 13500, Doble: 16500, Triple: 19500 }, destacado: true },
-      { id: "stacker", nombre: "Stacker", desc: "Pan, carne, cheddar, bacon, cebolla y salsa Paprika.", precios: { Simple: 13500, Doble: 16500, Triple: 19500 } },
-      { id: "quarter", nombre: "Quarter", desc: "Pan, carne, cheddar, cebolla, pepinillos agridulces y salsa Quarter.", precios: { Simple: 13500, Doble: 16500, Triple: 19500 } },
-      { id: "crispy-onion", nombre: "Crispy Onion", desc: "Pan, carne, cheddar, bacon, cebolla crispy y salsa alioli.", precios: { Simple: 13500, Doble: 16500, Triple: 19500 } },
+      { id: "american", nombre: "American", desc: "Pan, carne, cheddar, bacon, lechuga, tomate, cebolla, pepinillos agridulces y salsa Paprika.", img: "american.jpg", precios: { Simple: 13500, Doble: 16500, Triple: 19500 }, destacado: true },
+      { id: "stacker", nombre: "Stacker", desc: "Pan, carne, cheddar, bacon, cebolla y salsa Paprika.", img: "stacker.jpg", precios: { Simple: 13500, Doble: 16500, Triple: 19500 } },
+      { id: "quarter", nombre: "Quarter", desc: "Pan, carne, cheddar, cebolla, pepinillos agridulces y salsa Quarter.", img: "quarter.jpg", precios: { Simple: 13500, Doble: 16500, Triple: 19500 } },
+      { id: "crispy-onion", nombre: "Crispy Onion", desc: "Pan, carne, cheddar, bacon, cebolla crispy y salsa alioli.", img: "crispy-onion.jpg", precios: { Simple: 13500, Doble: 16500, Triple: 19500 } },
       { id: "crispy-deluxe", nombre: "Crispy Deluxe", desc: "Pan, carne, provolone, cheddar, dambo, bacon, cebolla crispy y salsa Paprika.", precios: { Simple: 14500, Doble: 17800, Triple: 20800 } },
       { id: "egg-bacon", nombre: "Egg Bacon", desc: "Pan, carne, cheddar, bacon y huevo.", precios: { Simple: 14000, Doble: 17000, Triple: 20000 } },
       { id: "spicy", nombre: "Spicy", desc: "Pan, carne, queso dambo, bacon, morrones asados, cebolla grillada y mayo picante.", precios: { Simple: 14500, Doble: 17800, Triple: 20800 } },
@@ -162,6 +162,19 @@ const MENU = [
   },
 ];
 
+// Combo del día (incluye papas y gaseosa chica).
+// "dias" usa los mismos números que los horarios y el id de una burger de la carta.
+const COMBO_DIA = {
+  nota: "Los combos incluyen papas y gaseosa chica",
+  precios: { Simple: 13500, Doble: 16500 },
+  dias: { 3: "american", 4: "stacker", 5: "cheese", 6: "crispy-onion", 0: "quarter" },
+};
+
 // Fotos para la galería (guardalas en /img). Si queda vacía, la sección no se muestra.
 // Ej: { img: "local.jpg", alt: "Nuestro local de noche" }
-const GALERIA = [];
+const GALERIA = [
+  { img: "stacker.jpg", alt: "Stacker triple con papas y dip de cheddar" },
+  { img: "crispy-onion.jpg", alt: "Crispy Onion doble con bacon y cebolla crispy" },
+  { img: "american.jpg", alt: "American con lechuga, tomate y bacon" },
+  { img: "cheese.jpg", alt: "Cheese doble recién mordida" },
+];

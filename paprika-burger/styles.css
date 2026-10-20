@@ -89,12 +89,15 @@ a { color: inherit; }
 .hero-cta { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; margin: 20px 0; }
 .hero-phone { font-family: "Bowlby One", sans-serif; color: var(--red); text-transform: uppercase; font-size: 1.3rem; margin: 0; }
 .hero-phone a { text-decoration: none; white-space: nowrap; }
-.hero-art img { width: 100%; max-width: 340px; margin: auto; animation: bounce 2.4s ease-in-out infinite; }
+.hero-art { position: relative; max-width: 400px; margin: auto; width: 100%; }
+.hero-photo { width: 100%; height: auto; aspect-ratio: 4 / 5; object-fit: cover; border-radius: 22px; border: 4px solid var(--red); box-shadow: 10px 10px 0 var(--red); transform: rotate(2deg); }
+.hero-mascot { position: absolute; left: -46px; bottom: -30px; width: 130px; animation: bounce 2.4s ease-in-out infinite; filter: drop-shadow(0 4px 0 var(--cream)); }
 @keyframes bounce { 50% { transform: translateY(-10px) rotate(-2deg); } }
 
 @media (max-width: 760px) {
   .hero { grid-template-columns: 1fr; }
-  .hero-art img { max-width: 200px; }
+  .hero-art { max-width: 300px; }
+  .hero-mascot { width: 96px; left: -20px; }
 }
 
 .promo {
@@ -191,7 +194,7 @@ a { color: inherit; }
   padding: 14px 0; border-bottom: 2px dashed rgba(196, 18, 47, .35);
 }
 .row:last-child { border-bottom: 0; }
-.row-photo { grid-row: span 2; width: 76px; height: 76px; border-radius: 12px; object-fit: cover; }
+.row-photo { width: 96px; height: 96px; border-radius: 12px; object-fit: cover; border: 2px solid var(--red); }
 .row.has-photo { grid-template-columns: auto 1fr auto; }
 .row h4 {
   margin: 0; font-family: Oswald, Impact, sans-serif; font-weight: 700; text-transform: uppercase;
@@ -214,11 +217,35 @@ a { color: inherit; }
 
 @media (max-width: 620px) {
   .row, .row.has-photo { grid-template-columns: 1fr; }
-  .row-photo { display: none; }
+  .row.has-photo { grid-template-columns: 84px 1fr; }
+  .row.has-photo .prices { grid-column: 1 / -1; }
+  .row-photo { width: 84px; height: 84px; }
   .prices { border-left: 0; border-top: 1.5px solid rgba(196, 18, 47, .35); padding-top: 8px; }
   .price { flex: 1; min-width: 0; }
   .cat-head img { width: 64px; }
 }
+
+/* ---------- Combo del día ---------- */
+.combos { text-align: center; }
+.combo-kicker { font-family: "Bowlby One", sans-serif; color: var(--red); text-transform: uppercase; font-size: clamp(1.3rem, 3.5vw, 2rem); margin: 0; }
+.combo-title { font-family: "Bowlby One", sans-serif; font-weight: 400; color: var(--red); text-transform: uppercase; font-size: clamp(3rem, 11vw, 6rem); line-height: .95; margin: 0 0 28px; }
+.combo-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 14px; }
+.combo {
+  position: relative; display: flex; flex-direction: column; align-items: center; gap: 8px;
+  border: 2px solid var(--red); border-radius: var(--radius); padding: 12px 12px 16px; background: #fff8ee;
+}
+.combo img { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 10px; }
+.combo h3 { margin: 0; font: 700 1.6rem/1 Oswald, sans-serif; color: var(--red); text-transform: uppercase; }
+.combo p { margin: 0; font: 400 1.15rem "Bowlby One", sans-serif; color: var(--ink); text-transform: uppercase; }
+.combo.hoy { background: var(--red); border-color: var(--red); box-shadow: 0 0 0 4px var(--cream), 0 0 0 7px var(--red); transform: scale(1.03); }
+.combo.hoy h3, .combo.hoy p { color: var(--cream); }
+.combo .hoy-tag { position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: var(--cream); color: var(--red); border: 2px solid var(--red); border-radius: 999px; padding: 2px 12px; font: 700 .8rem Oswald, sans-serif; letter-spacing: 1px; }
+.combo-btns { display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; }
+.combo-btns .btn { padding: 8px 12px; font-size: .85rem; background: var(--cream); color: var(--red); }
+.combo-btns .btn .in { margin-left: 4px; background: var(--green); color: #fff; border-radius: 999px; padding: 0 6px; font-size: .75rem; }
+.combo-foot { margin-top: 22px; display: flex; flex-direction: column; align-items: center; gap: 10px; }
+.combo-foot .precios { display: inline-flex; flex-wrap: wrap; justify-content: center; gap: 4px 22px; max-width: 100%; border: 2px solid var(--red); border-radius: 12px; padding: 8px 22px; font: 700 1.1rem Oswald, sans-serif; color: var(--red); text-transform: uppercase; }
+.combo-foot .precios strong { font-family: "Bowlby One", sans-serif; font-weight: 400; font-size: 1.5rem; margin-left: 6px; }
 
 /* ---------- Galería ---------- */
 .gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; }

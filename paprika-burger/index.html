@@ -32,6 +32,7 @@
       <span class="logo-main">Paprika</span><span class="logo-sub">Burger</span>
     </a>
     <nav class="nav" aria-label="Principal">
+      <a href="#combos">Combo del día</a>
       <a href="#menu">Carta</a>
       <a href="#envios">Envíos y pagos</a>
       <a href="#ubicacion">Ubicación</a>
@@ -51,13 +52,21 @@
         <p class="hero-phone">Pedí al <a id="tel-hero"></a></p>
       </div>
       <div class="hero-art">
-        <img src="img/mascota.svg" alt="Mascota de Paprika Burger: una hamburguesa con gorra y anteojos de sol" width="240" height="260">
+        <img class="hero-photo" src="img/stacker.jpg" alt="Stacker triple de Paprika Burger con papas fritas" width="900" height="1200" fetchpriority="high">
+        <img class="hero-mascot" src="img/mascota.svg" alt="" width="240" height="260">
       </div>
     </section>
 
     <div class="promo" id="promo">
       <span>★</span> <strong id="promo-pct"></strong> de descuento abonando en efectivo <span>★</span>
     </div>
+
+    <section class="section combos" id="combos" aria-labelledby="combos-title">
+      <p class="combo-kicker">Todos los días</p>
+      <h2 id="combos-title" class="combo-title">Un combo</h2>
+      <div class="combo-grid" id="combo-grid"></div>
+      <div class="combo-foot" id="combo-foot"></div>
+    </section>
 
     <section class="section" id="menu" aria-labelledby="menu-title">
       <h2 id="menu-title" class="sr-only">Carta</h2>

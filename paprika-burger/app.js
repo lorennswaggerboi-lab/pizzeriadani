@@ -16,6 +16,12 @@
   MENU.forEach((cat) => cat.items.forEach((it) => { ITEMS[it.id] = it; }));
   const disponibles = (cat) => cat.items.filter((it) => it.disponible !== false);
 
+  // Cada combo del día se carga como un producto más, para que el carrito lo trate igual
+  const comboId = (id) => `combo-${id}`;
+  Object.values(COMBO_DIA.dias).forEach((id) => {
+    ITEMS[comboId(id)] = { id: comboId(id), nombre: `Combo del día ${ITEMS[id].nombre}`, img: ITEMS[id].img, precios: COMBO_DIA.precios };
+  });
+
   const dirCompleta = `${N.direccion.calle}, ${N.direccion.localidad}, ${N.direccion.provincia}`;
   const igUrl = `https://www.instagram.com/${N.instagram}/`;
   const waUrl = (texto) => `https://wa.me/${N.whatsapp}${texto ? `?text=${encodeURIComponent(texto)}` : ""}`;
@@ -106,6 +112,31 @@
     }
   }
 
+  /* ---------------- Combo del día ---------------- */
+  function pintarCombos() {
+    const hoy = ahoraArgentina().dia;
+    const orden = [1, 2, 3, 4, 5, 6, 0].filter((d) => COMBO_DIA.dias[d]);
+    $("#combo-grid").innerHTML = orden.map((d) => {
+      const it = ITEMS[COMBO_DIA.dias[d]];
+      const esHoy = d === hoy;
+      return `
+        <article class="combo ${esHoy ? "hoy" : ""}">
+          ${esHoy ? '<span class="hoy-tag">HOY</span>' : ""}
+          <img src="img/${it.img || "mascota.svg"}" alt="${it.nombre}" loading="lazy">
+          <h3>${DIAS[d]}</h3>
+          <p>${it.nombre}</p>
+          ${esHoy ? `<div class="combo-btns">${opciones(ITEMS[comboId(it.id)]).map(([t]) =>
+            `<button class="btn price-combo" data-key="${comboId(it.id)}::${t}">+ ${t}</button>`).join("")}</div>` : ""}
+        </article>`;
+    }).join("");
+
+    const proximo = orden.find((d) => d > hoy) ?? orden[0];
+    $("#combo-foot").innerHTML = `
+      <p class="cat-note">★ ${COMBO_DIA.nota} ★</p>
+      <div class="precios">${opciones({ precios: COMBO_DIA.precios }).map(([t, p]) => `<span>${t}<strong>${fmt(p)}</strong></span>`).join("")}</div>
+      ${COMBO_DIA.dias[hoy] ? "" : `<p class="muted">Hoy ${DIAS[hoy].toLowerCase()} no hay combo del día: ¡te esperamos el ${DIAS[proximo].toLowerCase()}!</p>`}`;
+  }
+
   /* ---------------- Carta ---------------- */
   const slug = (s) => s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/\W+/g, "-");
 
@@ -168,6 +199,7 @@
   const KEY = "paprika-carrito";
   const valida = (key) => {
     const [id, t] = key.split("::");
+    if (id.startsWith("combo-") && id !== comboId(COMBO_DIA.dias[ahoraArgentina().dia])) return false;
     return ITEMS[id] && ITEMS[id].disponible !== false && opciones(ITEMS[id]).some(([x]) => x === t);
   };
   let carrito = {};
@@ -201,7 +233,7 @@
   function pintarCarrito() {
     const c = calcular();
 
-    document.querySelectorAll(".price").forEach((b) => {
+    document.querySelectorAll(".price, .price-combo").forEach((b) => {
       const q = carrito[b.dataset.key];
       let badge = b.querySelector(".in");
       if (q && !badge) { badge = document.createElement("span"); badge.className = "in"; b.appendChild(badge); }
@@ -321,11 +353,25 @@
 
   /* ---------------- Inicio ---------------- */
   pintarInfo();
+  pintarCombos();
   pintarMenu();
   pintarEstado();
   pintarCarrito();
   schema();
-  setInterval(pintarEstado, 60 * 1000);
+
+  let diaActual = ahoraArgentina().dia;
+  setInterval(() => {
+    pintarEstado();
+    if (ahoraArgentina().dia === diaActual) return;
+    // Cambió el día: se actualiza el combo y se descarta el de ayer del carrito
+    diaActual = ahoraArgentina().dia;
+    Object.keys(carrito).forEach((k) => { if (!valida(k)) delete carrito[k]; });
+    guardar(); pintarCombos(); pintarCarrito();
+  }, 60 * 1000);
+
+  $("#combo-grid").addEventListener("click", (e) => {
+    const b = e.target.closest(".price-combo"); if (b) cambiar(b.dataset.key, 1);
+  });
 
   $("#cart-fab").addEventListener("click", () => abrirCarrito(true));
   $("#cart-close").addEventListener("click", () => abrirCarrito(false));

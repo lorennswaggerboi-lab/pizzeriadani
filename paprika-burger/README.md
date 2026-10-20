@@ -32,6 +32,7 @@ Todo se hace en `data.js`:
 - **Sacar un producto sin borrarlo:** agregale `disponible: false`.
 - **Agregar una foto a un producto:** guardala en `img/` y poné `img: "american.jpg"` en ese producto.
 - **Galería:** agregá fotos a `GALERIA`, al final del archivo.
+- **Combo del día:** en `COMBO_DIA` se cambian los días, las burgers y los precios.
 - **Promo de efectivo:** `descuentoEfectivo: 10` (en `0` se desactiva).
 - **Horarios, zonas y costo de envío:** están en `NEGOCIO`.
 
@@ -47,7 +48,8 @@ Se tomaron de internet y de las historias destacadas de Instagram. Puede haber d
 - [ ] **Zonas y costo de envío:** las zonas son una propuesta. El costo figura como "a confirmar".
 - [ ] **Precios:** se usó la carta de WhatsApp. Las historias de Instagram tienen algunos precios distintos (Spicy, Pomodoro, Crispy Onion) y la burger "Campeona", que no está en la carta de WhatsApp.
 - [ ] **Logo y mascota:** `img/mascota.svg` es un dibujo aproximado. Reemplazarlo por el archivo original de la marca.
-- [ ] **Fotos de los productos:** pedirlas o bajarlas del Instagram del local.
+- [ ] **Fotos de los productos:** ya están las de Cheese, American, Stacker y Crispy Onion. La del Quarter está recortada del flyer de combos. Faltan las del resto de la carta.
+- [ ] **Combo del día:** miércoles a domingo, según el flyer. Lunes y martes no hay combo.
 
 ## Publicar
 
