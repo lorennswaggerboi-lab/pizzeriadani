@@ -103,7 +103,10 @@
     $("#como-llegar").href = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(dirCompleta)}`;
 
     $("#promo").hidden = !N.descuentoEfectivo;
-    $("#promo-pct").textContent = `${N.descuentoEfectivo}%`;
+    // Cinta que se desplaza: el texto se repite dos veces para que el bucle no tenga cortes
+    const frase = `<span>★ <strong>${N.descuentoEfectivo}%</strong> de descuento abonando en efectivo</span>`;
+    const tira = `<div class="marquee-track">${frase.repeat(4)}</div>`;
+    $("#marquee").innerHTML = tira + tira.replace("marquee-track", 'marquee-track" aria-hidden="true');
 
     $("#zonas").innerHTML = N.envio.zonas.map((z) => `<li>${z}</li>`).join("");
     $("#envio-costo").innerHTML = (N.envio.costo == null
@@ -195,21 +198,110 @@
       const it = ITEMS[COMBO_DIA.dias[d]];
       const esHoy = d === hoy;
       return `
-        <article class="combo ${esHoy ? "hoy" : ""}">
+        <article class="combo ${esHoy ? "hoy" : ""}" data-dia="${d}" tabindex="0" role="button" aria-label="Ver combo del ${DIAS[d].toLowerCase()}: ${esc(it.nombre)}">
           ${esHoy ? '<span class="hoy-tag">HOY</span>' : ""}
           <img src="${foto(it.img)}" alt="${esc(it.nombre)}" loading="lazy">
           <h3>${DIAS[d]}</h3>
           <p>${esc(it.nombre)}</p>
+          <span class="ver-mas">Ver detalle →</span>
           ${esHoy ? `<div class="combo-btns">${opciones(ITEMS[comboId(it.id)]).map(([t]) =>
             `<button class="btn price-combo" data-key="${comboId(it.id)}::${t}">+ ${t}</button>`).join("")}</div>` : ""}
         </article>`;
     }).join("");
 
+    revelar(".combo");
     const proximo = orden.find((d) => d > hoy) ?? orden[0];
     $("#combo-foot").innerHTML = `
       <p class="cat-note">★ ${COMBO_DIA.nota} ★</p>
       <div class="precios">${opciones({ precios: COMBO_DIA.precios }).map(([t, p]) => `<span>${t}<strong>${fmt(p)}</strong></span>`).join("")}</div>
       ${ITEMS[COMBO_DIA.dias[hoy]] ? "" : `<p class="muted">Hoy ${DIAS[hoy].toLowerCase()} no hay combo del día: ¡te esperamos el ${DIAS[proximo].toLowerCase()}!</p>`}`;
+  }
+
+  /* ---------------- Detalle (ventana emergente) ---------------- */
+  const botones = (it) => opciones(it).map(([t, p]) => `
+    <button class="price" data-key="${esc(it.id)}::${esc(t)}" aria-label="Agregar ${esc(it.nombre)} ${esc(t)}">
+      <small>${t ? esc(t) : "Precio"}</small>
+      <strong>${fmt(p)}</strong>
+      <span class="add" aria-hidden="true">+</span>
+    </button>`).join("");
+
+  const plural = (dia) => (dia.endsWith("s") ? dia : `${dia}s`).toLowerCase();
+
+  // dia: número de día si se abre desde un combo; undefined si se abre desde la carta
+  function abrirDetalle(id, dia) {
+    const it = ITEMS[id];
+    if (!it) return;
+    const esCombo = dia !== undefined;
+    const comboHoy = esCombo && dia === ahoraArgentina().dia;
+    const pedir = comboHoy ? ITEMS[comboId(id)] : it;
+    $("#detalle-body").innerHTML = `
+      <div class="det-img ${it.img ? "" : "sin-foto"}"><img src="${foto(it.img)}" alt="${it.img ? esc(it.nombre) : ""}"></div>
+      <div class="det-info">
+        ${esCombo ? `<p class="det-kicker">${comboHoy ? "★ Combo de hoy ★" : `Combo de los ${plural(DIAS[dia])}`}</p>` : ""}
+        <h3 id="detalle-titulo">${esc(it.nombre)}</h3>
+        ${it.desc ? `<p class="det-desc">${esc(it.desc)}</p>` : ""}
+        ${esCombo ? `<p class="cat-note">★ ${COMBO_DIA.nota} ★</p>` : ""}
+        ${esCombo && !comboHoy ? `<p class="muted">El combo sale solo los ${plural(DIAS[dia])}. Hoy la podés pedir de la carta:</p>` : ""}
+        <div class="producto-precios">${botones(pedir)}</div>
+      </div>`;
+    pintarCarrito();
+    $("#detalle").showModal();
+  }
+
+  /* ---------------- Animaciones ---------------- */
+  const sinMovimiento = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const revelador = "IntersectionObserver" in window && !sinMovimiento
+    ? new IntersectionObserver((entries, obs) => entries.forEach((en) => {
+      if (en.isIntersecting) { en.target.classList.add("visible"); obs.unobserve(en.target); }
+    }), { rootMargin: "0px 0px -8% 0px" })
+    : null;
+
+  // Hace aparecer los elementos al entrar en pantalla, escalonados dentro de cada grupo
+  function revelar(selector) {
+    if (!revelador) return;
+    document.querySelectorAll(selector).forEach((el) => {
+      if (el.classList.contains("reveal")) return;
+      const hermanos = [...el.parentElement.children].filter((x) => x.matches(selector));
+      el.style.setProperty("--d", `${(hermanos.indexOf(el) % 6) * 70}ms`);
+      el.classList.add("reveal");
+      revelador.observe(el);
+    });
+  }
+
+  let toastTimer;
+  function avisar(texto) {
+    const t = $("#toast");
+    t.textContent = texto;
+    t.classList.add("show");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => t.classList.remove("show"), 1800);
+  }
+
+  // Un puntito vuela desde el botón hasta el carrito
+  function volarAlCarrito(desde) {
+    const fab = $("#cart-fab");
+    fab.classList.remove("bump"); void fab.offsetWidth; fab.classList.add("bump");
+    if (sinMovimiento || !desde || !desde.animate) return;
+    const a = desde.getBoundingClientRect(), b = fab.getBoundingClientRect();
+    const dot = document.createElement("div");
+    dot.className = "fly";
+    dot.style.left = `${a.left + a.width / 2 - 12}px`;
+    dot.style.top = `${a.top + a.height / 2 - 12}px`;
+    document.body.appendChild(dot);
+    const dx = b.left + b.width / 2 - (a.left + a.width / 2), dy = b.top + b.height / 2 - (a.top + a.height / 2);
+    dot.animate([
+      { transform: "translate(0,0) scale(1)", opacity: 1 },
+      { transform: `translate(${dx * 0.5}px, ${dy * 0.5 - 120}px) scale(1.2)`, opacity: 1, offset: 0.5 },
+      { transform: `translate(${dx}px, ${dy}px) scale(.4)`, opacity: .3 },
+    ], { duration: 650, easing: "cubic-bezier(.5,0,.6,1)" }).onfinish = () => dot.remove();
+  }
+
+  function agregar(boton) {
+    const key = boton.dataset.key;
+    cambiar(key, 1);
+    const [id, t] = key.split("::");
+    avisar(`✓ ${ITEMS[id].nombre}${t ? ` (${t})` : ""} agregado`);
+    volarAlCarrito(boton);
   }
 
   /* ---------------- Carta ---------------- */
@@ -230,7 +322,7 @@
         ${c.nota ? `<p class="cat-note">★ ${c.nota} ★</p>` : ""}
         <div class="productos">
           ${disponibles(c).map((it) => `
-            <article class="producto">
+            <article class="producto" data-id="${esc(it.id)}">
               <div class="producto-img ${it.img ? "" : "sin-foto"}">
                 <img src="${foto(it.img)}" alt="${it.img ? esc(it.nombre) : ""}" loading="lazy">
                 ${it.destacado ? '<span class="tag">TOP</span>' : ""}
@@ -239,14 +331,7 @@
                 <h4>${esc(it.nombre)}</h4>
                 ${it.desc ? `<p>${esc(it.desc)}</p>` : ""}
               </div>
-              <div class="producto-precios">
-                ${opciones(it).map(([t, p]) => `
-                  <button class="price" data-key="${esc(it.id)}::${esc(t)}" aria-label="Agregar ${esc(it.nombre)} ${esc(t)}">
-                    <small>${t ? esc(t) : "Precio"}</small>
-                    <strong>${fmt(p)}</strong>
-                    <span class="add" aria-hidden="true">+</span>
-                  </button>`).join("")}
-              </div>
+              <div class="producto-precios">${botones(it)}</div>
             </article>`).join("")}
         </div>
         ${c.info ? `<div class="cat-info">${c.info.map((x) => `<div><b>${x.titulo}</b><span>${x.texto}</span></div>`).join("")}</div>` : ""}
@@ -271,8 +356,12 @@
     document.querySelectorAll(".cat").forEach((c) => obs.observe(c));
 
     $("#menu-list").addEventListener("click", (e) => {
-      const b = e.target.closest(".price"); if (b) cambiar(b.dataset.key, 1);
+      const b = e.target.closest(".price");
+      if (b) return agregar(b);
+      const card = e.target.closest(".producto");
+      if (card) abrirDetalle(card.dataset.id);
     });
+    revelar(".cat-head, .cat-note, .producto, .cat-info > div");
   }
 
   /* ---------------- Carrito ---------------- */
@@ -456,8 +545,27 @@
   });
 
   $("#combo-grid").addEventListener("click", (e) => {
-    const b = e.target.closest(".price-combo"); if (b) cambiar(b.dataset.key, 1);
+    const b = e.target.closest(".price-combo");
+    if (b) return agregar(b);
+    const card = e.target.closest(".combo");
+    if (card) abrirDetalle(COMBO_DIA.dias[card.dataset.dia], Number(card.dataset.dia));
   });
+  $("#combo-grid").addEventListener("keydown", (e) => {
+    const card = e.target.closest(".combo");
+    if (card && e.target === card && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); card.click(); }
+  });
+
+  const detalle = $("#detalle");
+  $("#detalle-close").addEventListener("click", () => detalle.close());
+  // Clic fuera de la ventana la cierra
+  detalle.addEventListener("click", (e) => {
+    const b = e.target.closest(".price");
+    if (b) return agregar(b);
+    if (e.target === detalle) detalle.close();
+  });
+
+  revelar(".combo-kicker, .combo-title, #envios .card, #ubicacion .title, .map-wrap, .gallery img, #galeria .title");
+  addEventListener("scroll", () => $(".topbar").classList.toggle("scrolled", scrollY > 10), { passive: true });
   $("#cart-fab").addEventListener("click", () => abrirCarrito(true));
   $("#cart-close").addEventListener("click", () => abrirCarrito(false));
   $("#overlay").addEventListener("click", () => abrirCarrito(false));

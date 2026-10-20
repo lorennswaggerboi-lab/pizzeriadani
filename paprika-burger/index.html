@@ -44,7 +44,7 @@
     <section class="hero" id="inicio">
       <div class="hero-text">
         <h1 class="logo logo-xl"><span class="logo-main">Paprika</span><span class="logo-sub">Burger</span></h1>
-        <p class="tagline">La espera<br>vale cada<br>mordida</p>
+        <p class="tagline"><span>La espera</span><span>vale cada</span><span>mordida</span></p>
         <div class="hero-cta">
           <a href="#menu" class="btn btn-red">Ver carta y pedir</a>
           <a id="ig-hero" class="btn btn-line" target="_blank" rel="noopener">Instagram</a>
@@ -57,9 +57,7 @@
       </div>
     </section>
 
-    <div class="promo" id="promo">
-      <span>★</span> <strong id="promo-pct"></strong> de descuento abonando en efectivo <span>★</span>
-    </div>
+    <div class="promo" id="promo"><div class="marquee" id="marquee"></div></div>
 
     <section class="section combos" id="combos" aria-labelledby="combos-title">
       <p class="combo-kicker">Todos los días</p>
@@ -119,6 +117,14 @@
     <p class="small">Precios sujetos a cambio sin previo aviso.</p>
   </footer>
   <div class="checker" aria-hidden="true"></div>
+
+  <!-- Detalle de un producto o combo -->
+  <dialog class="detalle" id="detalle" aria-labelledby="detalle-titulo">
+    <button class="icon-btn detalle-close" id="detalle-close" aria-label="Cerrar">✕</button>
+    <div id="detalle-body"></div>
+  </dialog>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
   <!-- Botón flotante del carrito -->
   <button class="cart-fab" id="cart-fab" aria-controls="cart" aria-expanded="false" hidden>
